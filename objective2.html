@@ -1,76 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Global Inflation Comparison</title>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bar Charts</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* Add any necessary CSS styling here */
+        .chart {
+            float: left;
+            margin-right: 20px;
+        }
+
+        .chart svg {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .bar {
+            fill: steelblue;
+        }
+
+        .bar:hover {
+            fill: orange;
+        }
+
+        .axis-x text {
+            font-size: 12px;
+        }
+
+        .axis-y text {
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
-  <h2>Global Inflation Comparison</h2>
-  <svg width="800" height="400"></svg>
 
-  <script>
-    // Sample data (replace with your merged data)
-    const data = [
-      {"Country": "Algeria", "InflationRate": 9.7},
-      {"Country": "Angola", "InflationRate": 46.7},
-      {"Country": "Antigua and Barbuda", "InflationRate": 19},
-      {"Country": "Australia", "InflationRate": 10.1},
-      {"Country": "Austria", "InflationRate": 6.3},
-      {"Country": "Bahamas, The", "InflationRate": 12.2}
-    ];
+<div class="chart" id="chart1"></div>
+<div class="chart" id="chart2"></div>
 
-    // Set up SVG and margins
-    const margin = { top: 30, right: 30, bottom: 70, left: 60 };
-    const width = 800 - margin.left - margin.right;
-    const height = 400 - margin.top - margin.bottom;
+<script>
+    // Parse the first CSV data
+    d3.csv("global_inflation_data.csv").then(function(data) {
 
-    const svg = d3.select("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        console.log(" Global Inflation Data Headers:");
+    console.log(Object.keys(data[0]));
+    console.log("Global Inflation Number of Records: " + data.length);
+        // Define the dimensions of the canvas
+        var margin = {top: 20, right: 30, bottom: 30, left: 40},
+            width = 400 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
 
-    // Set up scales
-    const xScale = d3.scaleBand()
-      .domain(data.map(d => d.Country))
-      .range([0, width])
-      .padding(0.2);
+        // Create the SVG canvas
+        var svg = d3.select("#chart1")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    const yScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.InflationRate)])
-      .range([height, 0]);
-    svg.selectAll("rect")
-      .data(data)
-      .enter()
-      .append("rect")
-      .attr("x", d => xScale(d.Country))
-      .attr("y", d => yScale(d.InflationRate))
-      .attr("width", xScale.bandwidth())
-      .attr("height", d => height - yScale(d.InflationRate))
-      .attr("fill", "steelblue");
-    svg.append("g")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(xScale))
-      .selectAll("text")
-      .attr("transform", "rotate(-45)")
-      .style("text-anchor", "end");
-    svg.append("g")
-      .call(d3.axisLeft(yScale));
-    svg.append("text")
-      .attr("x", (width / 2))
-      .attr("y", height + margin.top + 20)
-      .attr("text-anchor", "middle")
-      .text("Country");
+        // Define the scales
+        var x = d3.scaleBand()
+            .domain(data.map(function(d) { return d.country_name; }))
+            .range([0, width])
+            .padding(0.1);
 
-    svg.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 0 - margin.left)
-      .attr("x", 0 - (height / 2))
-      .attr("dy", "1em")
-      .style("text-anchor", "middle")
-      .text("Inflation Rate (%)");
-  </script>
+        var y = d3.scaleLinear()
+            .domain([0, d3.max(data, function(d) { return +d["2024"]; })])
+            .nice()
+            .range([height, 0]);
+
+        // Create the bars
+        svg.selectAll(".bar")
+            .data(data)
+            .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function(d) { return x(d.country_name); })
+            .attr("width", x.bandwidth())
+            .attr("y", function(d) { return y(+d["2024"]); })
+            .attr("height", function(d) { return height - y(+d["2024"]); });
+
+        // Add the X axis
+        svg.append("g")
+            .attr("class", "axis-x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        // Add the Y axis
+        svg.append("g")
+            .attr("class", "axis-y")
+            .call(d3.axisLeft(y));
+    });
+
+    // Parse the second CSV data
+    d3.csv("indian_agriculture_dataset.csv").then(function(data) {
+        // Define the dimensions of the canvas
+        var margin = {top: 20, right: 30, bottom: 30, left: 40},
+            width = 400 - margin.left - margin.right,
+            height = 300 - margin.top - margin.bottom;
+
+        // Create the SVG canvas
+        var svg = d3.select("#chart2")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Define the scales
+        var x = d3.scaleBand()
+            .domain(data.map(function(d) { return d["Dist Name"]; }))
+            .range([0, width])
+            .padding(0.1);
+
+        var y = d3.scaleLinear()
+            .domain([0, d3.max(data, function(d) { return +d["RICE PRODUCTION (1000 tons)"]; })])
+            .nice()
+            .range([height, 0]);
+
+        // Create the bars
+        svg.selectAll(".bar")
+            .data(data)
+            .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function(d) { return x(d["Dist Name"]); })
+            .attr("width", x.bandwidth())
+            .attr("y", function(d) { return y(+d["RICE PRODUCTION (1000 tons)"]); })
+            .attr("height", function(d) { return height - y(+d["RICE PRODUCTION (1000 tons)"]); });
+
+        // Add the X axis
+        svg.append("g")
+            .attr("class", "axis-x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        // Add the Y axis
+        svg.append("g")
+            .attr("class", "axis-y")
+            .call(d3.axisLeft(y));
+    });
+</script>
+
 </body>
 </html>

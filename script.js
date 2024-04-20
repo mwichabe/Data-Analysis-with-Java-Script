@@ -1,5 +1,8 @@
 d3.csv("indian_agriculture_dataset.csv").then(function(data) {
     console.log("Data loaded successfully.");
+    console.log("Data Headers:");
+    console.log(Object.keys(data[0]));
+    console.log("Number of Records: " + data.length);
 
     // Convert string values to appropriate data types
     data.forEach(function(d) {
