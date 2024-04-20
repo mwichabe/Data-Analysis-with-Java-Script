@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Warming Scatter Plot</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* Add any custom styling here */
+        circle {
+            fill: steelblue;
+            fill-opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Set up the dimensions and margins for the scatter plot
+        const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+        const width = 800 - margin.left - margin.right;
+        const height = 600 - margin.top - margin.bottom;
+
+        // Create SVG element
+        const svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        // Read the data
+        d3.csv("globalwarming.csv").then(function(data) {
+            // Convert strings to numbers
+            data.forEach(function(d) {
+                d.Temperature = +d.Temperature;
+                d.Year = +d.Year.substring(1); // Remove the 'F' from the year
+            });
+
+            // Define scales for x and y axes
+            const xScale = d3.scaleLinear()
+                .domain(d3.extent(data, d => d.Year))
+                .range([0, width]);
+
+            const yScale = d3.scaleLinear()
+                .domain(d3.extent(data, d => d.Temperature))
+                .range([height, 0]);
+
+            // Draw circles for the scatter plot
+            svg.selectAll("circle")
+                .data(data)
+                .enter().append("circle")
+                .attr("cx", d => xScale(d.Year))
+                .attr("cy", d => yScale(d.Temperature))
+                .attr("r", 5);
+
+            // Add x-axis
+            svg.append("g")
+                .attr("transform", `translate(0, ${height})`)
+                .call(d3.axisBottom(xScale));
+
+            // Add y-axis
+            svg.append("g")
+                .call(d3.axisLeft(yScale));
+
+            // Add x-axis label
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", height + margin.top)
+                .style("text-anchor", "middle")
+                .text("Year");
+
+            // Add y-axis label
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("x", -height / 2)
+                .attr("y", -margin.left)
+                .style("text-anchor", "middle")
+                .text("Temperature (°C)");
+        });
+    </script>
+</body>
+</html>

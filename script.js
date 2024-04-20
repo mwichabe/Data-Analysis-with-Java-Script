@@ -1,26 +1,34 @@
 d3.csv("indian_agriculture_dataset.csv").then(function(data) {
-    // Filter data for a specific crop (e.g., RICE)
-    var riceData = data.filter(function(d) {
-        return d["Dist Name"] === "Durg" && d["State Name"] === "Chhattisgarh";
-    });
-
-    // Convert string values to numbers
-    riceData.forEach(function(d) {
+    // Convert string values to appropriate data types
+    data.forEach(function(d) {
         d.Year = +d.Year;
         d["RICE PRODUCTION (1000 tons)"] = +d["RICE PRODUCTION (1000 tons)"];
+        // Convert other relevant columns to appropriate data types if needed
     });
 
-    // Set up the dimensions for the chart
+    // Proceed to Exploratory Data Analysis (EDA)
+    performEDA(data);
+});
+
+function performEDA(data) {
+    // Statistical analysis
+    // You can compute summary statistics, detect outliers, etc.
+
+    // Visualization: Time series graphs for key crops
     var margin = { top: 20, right: 30, bottom: 30, left: 60 },
         width = 600 - margin.left - margin.right,
         height = 400 - margin.top - margin.bottom;
 
-    // Append the SVG object to the body of the page
     var svg = d3.select("body").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Filter data for a specific crop (e.g., RICE)
+    var riceData = data.filter(function(d) {
+        return d["Dist Name"] === "Durg" && d["State Name"] === "Chhattisgarh";
+    });
 
     // Add X axis
     var x = d3.scaleLinear()
@@ -47,8 +55,8 @@ d3.csv("indian_agriculture_dataset.csv").then(function(data) {
             .x(function(d) { return x(d.Year); })
             .y(function(d) { return y(d["RICE PRODUCTION (1000 tons)"]); })
         );
-    
-    // Add title
+
+    // Add labels
     svg.append("text")
         .attr("x", (width / 2))
         .attr("y", 0 - (margin.top / 2))
@@ -56,13 +64,10 @@ d3.csv("indian_agriculture_dataset.csv").then(function(data) {
         .style("font-size", "16px")
         .text("Rice Production in Chhattisgarh (1966-1969)");
 
-    // Add X axis label
     svg.append("text")
         .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.top + 20) + ")")
         .style("text-anchor", "middle")
         .text("Year");
-
-    // Add Y axis label
     svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left)
@@ -70,5 +75,4 @@ d3.csv("indian_agriculture_dataset.csv").then(function(data) {
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Rice Production (1000 tons)");
-
-});
+}
