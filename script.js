@@ -1,4 +1,6 @@
 d3.csv("indian_agriculture_dataset.csv").then(function(data) {
+    console.log("Data loaded successfully.");
+
     // Convert string values to appropriate data types
     data.forEach(function(d) {
         d.Year = +d.Year;
@@ -6,20 +8,19 @@ d3.csv("indian_agriculture_dataset.csv").then(function(data) {
         // Convert other relevant columns to appropriate data types if needed
     });
 
-    // Proceed to Exploratory Data Analysis (EDA)
+    // Exploratory Data Analysis (EDA)
     performEDA(data);
 });
 
 function performEDA(data) {
-    // Statistical analysis
-    // You can compute summary statistics, detect outliers, etc.
+    console.log("Performing Exploratory Data Analysis (EDA).");
 
     // Visualization: Time series graphs for key crops
     var margin = { top: 20, right: 30, bottom: 30, left: 60 },
         width = 600 - margin.left - margin.right,
         height = 400 - margin.top - margin.bottom;
 
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select("#visualization").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
@@ -75,4 +76,6 @@ function performEDA(data) {
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Rice Production (1000 tons)");
+
+    console.log("EDA completed successfully.");
 }
